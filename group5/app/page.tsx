@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 
 interface WeatherData {
@@ -63,13 +65,8 @@ const Page: React.FC<{ locationData: LocationData; weatherData: WeatherData; }> 
   return (
     <div>
       <h1>Weather App</h1>
-      {/* Wrap the buttons with dynamic imports */}
-      {typeof window !== 'undefined' && (
-        <button onClick={getLocation}>Get Location</button>
-      )}
-      {typeof window !== 'undefined' && (
-        <button onClick={getWeather}>Get Weather</button>
-      )}
+      <button onClick={getLocation}>Get Location</button>
+      <button onClick={getWeather}>Get Weather</button>
       {errorMessage && <p>{errorMessage}</p>}
       {weatherData && (
         <div>
