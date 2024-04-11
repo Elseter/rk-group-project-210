@@ -122,7 +122,7 @@ const Page: React.FC = () => {
         }
       });
 
-      const marker = new mapboxgl.Marker().setLngLat([43.2431, 76.9136]).addTo(map);
+      const marke = new mapboxgl.Marker().setLngLat([43.2431, 76.9136]).addTo(map);
 
       // Set the map to the state
       setMap(map);
