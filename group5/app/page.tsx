@@ -66,16 +66,15 @@ const Page: React.FC<{ locationData: LocationData; weatherData: WeatherData; }> 
     <div>
       <h1>Weather App</h1>
       <button onClick={getLocation}>Get Location</button>
-      <button onClick={getWeather}>Get Weather</button>
       {errorMessage && <p>{errorMessage}</p>}
-      {weatherData && (
+      {locationData && (
         <div>
-          <h2>{weatherData.location}</h2>
-          <p>{weatherData.temperature_c}°C</p>
-          <p>{weatherData.temperature_f}°F</p>
-          <img src={weatherData.icon} alt="weather icon" />
+          <h2>Location Information</h2>
+          <p>Latitude: {locationData.latitude}</p>
+          <p>Longitude: {locationData.longitude}</p>
         </div>
       )}
+  
     </div>
   );
 }
