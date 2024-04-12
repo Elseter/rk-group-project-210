@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import mapboxgl from 'mapbox-gl';
+
 
 
 // Set your Mapbox access token here
@@ -27,6 +28,44 @@ const Page: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [locationData, setLocationData] = useState<LocationData | null>(null);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearchSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${searchTerm}.json?access_token=${mapboxgl.accessToken}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch location data.');
+      }
+      const data = await response.json();
+      if (data.features.length === 0) {
+        throw new Error('Location not found.');
+      }
+      const longitude = data.features[0].center[0];
+      const latitude = data.features[0].center[1];
+      
+      setLocationData({ latitude, longitude });
+      setErrorMessage(null);
+      getWeather(latitude, longitude);
+      
+      if (map) {
+        map.flyTo({
+          center: [longitude, latitude],
+          essential: true, // animate the transition
+          zoom: 10
+        });
+      }
+
+      } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getWeather = async (latitude: number, longitude: number) => {
     try {
@@ -79,6 +118,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     getLocation(); // Fetch location when the component mounts
+  
   }, []);
 
   useEffect(() => {
@@ -93,10 +133,6 @@ const Page: React.FC = () => {
 
       // Add navigation controls to the map
       map.addControl(new mapboxgl.NavigationControl());
-
-      if (locationData){
-        new mapboxgl.Marker().setLngLat([locationData.longitude, locationData.latitude]).addTo(map);
-      }
 
       map.on('dblclick', async (e) => {
         const { lng, lat } = e.lngLat;
@@ -122,13 +158,11 @@ const Page: React.FC = () => {
         }
       });
 
-      const marke = new mapboxgl.Marker().setLngLat([43.2431, 76.9136]).addTo(map);
-
       // Set the map to the state
       setMap(map);
     };
 
-    if (locationData) {
+    if (locationData && !map) {
       initializeMap();
     }
   }, [locationData]);
@@ -136,25 +170,38 @@ const Page: React.FC = () => {
   return (
     <div>
       <div className="container">
-        <h1>Weather App</h1>
-        <button onClick={getLocation}>Get Location</button>
-        {errorMessage && <p>{errorMessage}</p>}
-        {locationData && (
-          <div>
-            <h2>Location Information</h2>
-            <p>Latitude: {locationData.latitude.toFixed(4)}</p>
-            <p>Longitude: {locationData.longitude.toFixed(4)}</p>
-          </div>
-        )}
-        {weatherData && (
-          <div>
-            <h2>Weather Information</h2>
-            <p>Location: {weatherData.location}</p>
-            <p>Temperature (C): {weatherData.temperature_c}</p>
-            <p>Temperature (F): {weatherData.temperature_f}</p>
-            <img src={weatherData.icon} alt="Weather icon" />
-          </div>
-        )}
+        <div className="weather_container">
+          <h1>Weather App</h1>
+          <button onClick={getLocation}>Get Location</button>
+          {errorMessage && <p>{errorMessage}</p>}
+          {locationData && (
+            <div>
+              <h2>Location Information</h2>
+              <p>Latitude: {locationData.latitude.toFixed(4)}</p>
+              <p>Longitude: {locationData.longitude.toFixed(4)}</p>
+            </div>
+          )}
+          {weatherData && (
+            <div>
+              <h2>Weather Information</h2>
+              <p>Location: {weatherData.location}</p>
+              <p>Temperature (C): {weatherData.temperature_c}</p>
+              <p>Temperature (F): {weatherData.temperature_f}</p>
+              <img src={weatherData.icon} alt="Weather icon" />
+            </div>
+          )}
+        </div>
+      </div>
+      <div className='search_container'>
+        <form onSubmit={handleSearchSubmit}>
+          <input
+            type="text"
+            placeholder="Enter location..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          <button type="submit">Search</button>
+        </form>
       </div>
       <div id="map" className="map-container"></div> {/* Map container */}
     </div>
