@@ -58,7 +58,7 @@ const Page: React.FC = () => {
         map.flyTo({
           center: [longitude, latitude],
           essential: true, // animate the transition
-          zoom: 10
+          zoom: 13
         });
       }
 
@@ -98,6 +98,13 @@ const Page: React.FC = () => {
           setLocationData({ latitude, longitude });
           setErrorMessage(null);
           getWeather(latitude, longitude);
+          if (map) {
+            map.flyTo({
+              center: [longitude, latitude],
+              essential: true, // animate the transition
+              zoom: 13
+            });
+          }
         },
         (error) => {
           setErrorMessage(`Error getting location: ${error.message}`);
