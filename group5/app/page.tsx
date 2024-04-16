@@ -1,18 +1,49 @@
-"use client";
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+'use client';
+import React, { useState } from 'react';
+
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your login logic here, e.g., sending username and password to server for authentication
-    console.log('Username:', username);
-    console.log('Password:', password);
-    // You can also redirect the user to another page after successful login
+
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        // Authentication successful
+        window.location.href = '/dashboard'; // Redirect to dashboard page
+      } else {
+        // Authentication failed
+        const data = await response.json();
+        setError(data.message || 'Authentication failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('An unexpected error occurred');
+    }
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const handleRegisterClick = () => {
+    // Redirect to the registration page
+    window.location.href = '/create_user';
   };
 
   return (
@@ -25,6 +56,7 @@ const LoginPage: React.FC = () => {
             type="text"
             id="username"
             value={username}
+            onChange={handleUsernameChange}
           />
         </div>
         <div className="form-group">
@@ -33,10 +65,15 @@ const LoginPage: React.FC = () => {
             type="password"
             id="password"
             value={password}
+            onChange={handlePasswordChange}
           />
         </div>
+        {error && <div className="error-message">{error}</div>}
         <button type="submit">Login</button>
       </form>
+      
+      {/* Link to Register User Page */}
+      <p>Don't have an account? <button onClick={handleRegisterClick}>Register</button></p>
     </div>
   );
 };

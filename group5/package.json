@@ -12,9 +12,11 @@
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "mapbox-gl": "^3.3.0",
     "mapbox-gl-geocoder": "^2.0.1",
+    "mysql2": "^3.9.4",
     "next": "14.1.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
     "@types/mapbox-gl": "^3.1.0",
