@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
 
       if (response.ok) {
         // Authentication successful
-        window.location.href = '/dashboard'; // Redirect to dashboard page
+        window.location.href = `/main_page?username=${username}`; // Redirect to main page
       } else {
         // Authentication failed
         const data = await response.json();
@@ -36,6 +36,7 @@ const LoginPage: React.FC = () => {
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
+-
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
