@@ -10,8 +10,8 @@ Before running this project, ensure that you have Docker and Docker Compose inst
 To get started with this project, follow these steps:
 
 Clone the repository to your local machine:
-```bash 
-git clone https://github.com/yourusername/project-name.git
+```bash
+git clone https://github.com/Elseter/rk-group-project-210.git
 ```
 Navigate to the project directory:
 ```bash
