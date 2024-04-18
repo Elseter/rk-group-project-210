@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  flaskapp:
+    container_name: my-flask-container  # Custom name for the Flask service
+    build: ./flaskBackendSQL
+    ports:
+      - "5050:5000"
+    volumes:
+      - ./flaskBackendSQL:/app
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: my-mysql-container  # Custom name for the MySQL service
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: users
+      MYSQL_USER: rking
+      MYSQL_PASSWORD: entrance
+    volumes:
+      - ./flaskBackendSQL/sql-scripts:/docker-entrypoint-initdb.d/
+
+  nextjs:
+    container_name: my-react-container  # Custom name for the ReactJS service
+    build: ./group5
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./group5:/app
+    environment:
+      - NODE_ENV=development
