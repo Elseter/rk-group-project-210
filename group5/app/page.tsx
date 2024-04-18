@@ -11,7 +11,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('http://localhost:5050/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,9 +73,10 @@ const LoginPage: React.FC = () => {
       </form>
       
       {/* Link to Register User Page */}
-      <p>Don't have an account? <button onClick={handleRegisterClick}>Register</button></p>
+      <p>Don&apos;t have an account? <button onClick={handleRegisterClick}>Register</button></p>
     </div>
   );
 };
 
 export default LoginPage;
+

@@ -2,8 +2,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import mapboxgl from 'mapbox-gl';
 
-
-
 // Set your Mapbox access token here
 mapboxgl.accessToken = 'pk.eyJ1IjoicmtpbmczNDI1IiwiYSI6ImNsdXZubnNjeTA1N2wybG90MGdybjdqc2UifQ.cYnE4YkUPPTBM-4uvTlyMQ';
 const api_Key = 'bba90656b0dc4ae2996162721241104';
@@ -32,15 +30,10 @@ const Page: React.FC = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [savedLocations, setSavedLocations] = useState<any[]>([]);
+  const [username, setUsername] = useState<string | null>(null);
+  const [savedLocationsLoaded, setSavedLocationsLoaded] = useState(false);
 
-  // username grabbed from the URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const username = urlParams.get('username');
 
-  // if username is null, redirect to login page
-  if (username === null) {
-    window.location.href = '/';
-  }
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -151,7 +144,7 @@ const Page: React.FC = () => {
     if (locationData) {
       // Send a request to your backend API to add the current location to the user
       try {
-        const response = await fetch('http://localhost:5000/add_location', {
+        const response = await fetch('http://localhost:5050/add_location', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -166,6 +159,7 @@ const Page: React.FC = () => {
           throw new Error('Failed to add location.');
         }
         console.log('Location added successfully');
+        getSavedLocations();
         // Optionally, you can provide feedback to the user here
       } catch (error) {
         console.error('Error adding location:', error);
@@ -180,7 +174,7 @@ const Page: React.FC = () => {
 
   const getSavedLocations = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get_locations', {
+      const response = await fetch('http://localhost:5050/get_locations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -229,10 +223,40 @@ const Page: React.FC = () => {
     return `${city}, ${state}`;
   };
 
+  const handleRemoveLocation = async (latitude: any, longitude: any) => {
+    try {
+      const response = await fetch('http://localhost:5050/remove_location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username, latitude: latitude, longitude: longitude })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to remove location');
+      }
+      // After removing the location, fetch saved locations again to update the list
+      getSavedLocations();
+    } catch (error) {
+      setErrorMessage('Failed to remove location');
+    }
+  };
+
+  const handleLocationRightClick = (event: { preventDefault: () => void; }, latitude: any, longitude: any) => {
+    event.preventDefault(); // Prevent default right-click behavior
+    const confirmRemove = window.confirm('Are you sure you want to remove this location?');
+    if (confirmRemove) {
+      handleRemoveLocation(latitude, longitude);
+    }
+  };
+  
 
   useEffect(() => {
-    getLocation(); // Fetch location when the component mounts
-    getSavedLocations();
+      // feetch the username from the current url
+      const url = new URL(window.location.href);
+      const username = url.searchParams.get("username");
+      setUsername(username);
+        getLocation(); // Fetch location when the component mounts
   }, []);
 
   useEffect(() => {
@@ -243,6 +267,11 @@ const Page: React.FC = () => {
         style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
         center: [locationData?.longitude || 0, locationData?.latitude || 0], // starting position [lng, lat]
         zoom: 15 // starting zoom
+      });
+
+      getSavedLocations().then(() => {
+        // Set saved locations loaded to true once the locations are fetched
+        setSavedLocationsLoaded(true);
       });
 
       // Add navigation controls to the map
@@ -306,6 +335,7 @@ const Page: React.FC = () => {
               <img src={weatherData.icon} alt="Weather icon" />
             </div>
           )}
+          {errorMessage && <p>{errorMessage}</p>}
         </div>
       </div>
       <div className='search_container'>
@@ -320,15 +350,19 @@ const Page: React.FC = () => {
         </form>
       </div>
       <div className='locations_container'>
-        <h2>Saved Locations</h2>
+      <h2>Saved Locations</h2>
+      {savedLocationsLoaded ? (
         <ul>
           {savedLocations.map((location, index) => (
-          <li key={index} onClick={() => getWeatherDataAndMove(location[0], location[1])}>
-             {location[2]}
-          </li>
-        ))}
+            <li key={index} onClick={() => getWeatherDataAndMove(location[0], location[1])} onContextMenu={(event) => handleLocationRightClick(event, location[0], location[1])}>
+              {location[2]}
+            </li>
+          ))}
         </ul>
-      </div>
+      ) : (
+        <p>Loading saved locations...</p>
+      )}
+    </div>
       <div id="map" className="map-container"></div> {/* Map container */}
     </div>
   );

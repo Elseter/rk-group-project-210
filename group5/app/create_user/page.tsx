@@ -24,7 +24,7 @@ const RegisterPage: React.FC = () => {
 
     // If form is valid, continue with registration logic
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch('http://localhost:5050/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,6 +61,7 @@ const RegisterPage: React.FC = () => {
   const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value);
   };
+  
 
   return (
     <div className="register-page">
