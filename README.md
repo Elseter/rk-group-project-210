@@ -10,11 +10,17 @@ Before running this project, ensure that you have Docker and Docker Compose inst
 To get started with this project, follow these steps:
 
 Clone the repository to your local machine:
-```bash git clone https://github.com/yourusername/project-name.git```
+```bash 
+git clone https://github.com/yourusername/project-name.git
+```
 Navigate to the project directory:
-```bash cd project-name```
+```bash
+cd project-name
+```
 Build and run the Docker Compose stack:
-```css docker-compose up --build```
+```css 
+docker-compose up --build
+```
 Once the containers are up and running, you can access the FlaskBackend API at http://localhost:5050 and the ReactJS server at http://localhost:3000.
 ## Configuration
 FlaskBackend API: The Flask application is configured in the flaskBackendSQL directory. You can modify the Flask app code in app.py and add your routes, controllers, and models as needed.
