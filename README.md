@@ -19,7 +19,11 @@ cd project-name
 ```
 Build and run the Docker Compose stack:
 ```css 
-docker-compose up --build
+docker-compose build
+```
+then
+```css 
+docker-compose up
 ```
 Once the containers are up and running, you can access the FlaskBackend API at http://localhost:5050 and the ReactJS server at http://localhost:3000.
 ## Configuration
